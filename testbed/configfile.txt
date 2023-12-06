@@ -1,0 +1,126 @@
+//isso é só para pingar de testbed1 para gpu6
+table3 = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table3.entry_with_gvt_forward(src_addr = 0x00154d1211a9, port = "188" , dst_mac = 0xb8599fdf07cb, src_mac = 0x00154d1211a9).push()
+
+entry = table3.entry_with_gvt_forward(src_addr = 0xb8599fdf07cb, port = "132" , dst_mac = 0x00154d1211a9, src_mac = 0xb8599fdf07cb).push()
+
+
+
+//switch 2 - tofino 2
+table3 = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table3.entry_with_gvt_forward(src_addr = 0x00154d1211a9, port = "136" , dst_mac = 0x000000000001, src_mac = 0x000000000001).push()
+
+entry = table3.entry_with_gvt_forward(src_addr = 0x000000000002, port = "188" , dst_mac = 0xb8599fdf07cb, src_mac = 0x00154d1211a9).push()
+
+
+entry = table3.entry_with_gvt_forward(src_addr = 0xb8599fdf07cb, port = "132" , dst_mac = 0x00154d1211a9, src_mac = 0xb8599fdf07cb).push()
+
+
+
+
+//switch 1
+table3 = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table3.entry_with_gvt_forward(src_addr = 0x000000000001, port = "136" , dst_mac = 0x000000000002, src_mac = 0x000000000002).push()
+
+------------------------------------------------ trying port 31-------------------------------
+
+table3 = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table3.entry_with_gvt_forward(src_addr = 0x00154d1211a8, port = "31" , dst_mac = 0x000000000001, src_mac = 0x000000000001).push()
+
+entry = table3.entry_with_gvt_forward(src_addr = 0x000000000002, port = "189" , dst_mac = 0xb8599fdf07ca, src_mac = 0x00154d1211a8).push()
+
+
+entry = table3.entry_with_gvt_forward(src_addr = 0xb8599fdf07ca, port = "140" , dst_mac = 0x00154d1211a8, src_mac = 0xb8599fdf07ca).push()
+
+
+table3 = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table3.entry_with_gvt_forward(src_addr = 0x000000000001, port = "31" , dst_mac = 0x000000000002, src_mac = 0x000000000002).push()
+
+
+/-----------------------netgvt with replication---------------------------/
+
+table3 = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table3.entry_with_gvt_forward(src_addr = 0x00154d1211a9, port = "136" , dst_mac = 0x000000000001, src_mac = 0x000000000001).push()
+
+entry = table3.entry_with_gvt_forward(src_addr = 0x000000000001, port = "132" , dst_mac = 0x00154d1211a9, src_mac = 0x00154d1211a9).push()
+
+
+//switch 1
+table3 = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table3.entry_with_gvt_forward(src_addr = 0x000000000001, port = "136" , dst_mac = 0x000000000001, src_mac = 0x000000000001).push()
+
+entry = table3.entry_with_gvt_forward(src_addr = 0x00154d1211a8, port = "132" , dst_mac = 0x00154d1211a8, src_mac = 0x00154d1211a8).push()
+
+/----------------------end netgvt with replication-----------------------/
+
+
+bfrt.netgvt_l2_16.pipe.LVT_pid_1.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_2.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_3.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_4.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_5.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_6.add(0, 100000)
+
+
+/-----------------------netgvt without replication---------------------------/
+
+table = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table.entry_with_gvt_forward(src_addr = 0x00154d1211a9, port = "132" , dst_mac = 0x00154d1211a9, src_mac = 0x00154d1211a9).push()
+
+
+
+bfrt.netgvt_l2_16.pipe.LVT_pid_1.add(0, 1000000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_2.add(0, 1000000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_3.add(0, 1000000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_4.add(0, 1000000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_5.add(0, 1000000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_6.add(0, 1000000)
+
+/----------------------end netgvt with replication-----------------------/
+
+bfrt.netgvt_l2_16.pipe.LVT_pid_0.add(0, 0)
+bfrt.netgvt_l2_16.pipe.GVT.add(0, 0)
+
+
+
+-----------------------------------------netgvt with multicast----------------------------------
+multicast_grp = bfrt.pre.node.add(1)
+
+entry = bfrt.pre.node.entry(MULTICAST_NODE_ID = 1,MULTICAST_RID = 1,DEV_PORT = [132,188]).push()
+
+entry = bfrt.pre.mgid.entry(MGID = 1, MULTICAST_NODE_ID = [1,], MULTICAST_NODE_L1_XID_VALID = [False,],MULTICAST_NODE_L1_XID = [0, ]).push()
+
+
+bfrt.netgvt_l2_16.pipe.LVT_pid_2.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_3.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_4.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_5.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_6.add(0, 100000)
+
+
+/---------------------------------netgvt with replication gpu6-------------------------------------/
+
+/-----------------------netgvt with replication---------------------------/
+
+table3 = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table3.entry_with_gvt_forward(src_addr = 0xb8599fdf07cb, port = "136" , dst_mac = 0x000000000001, src_mac = 0x000000000001).push()
+
+entry = table3.entry_with_gvt_forward(src_addr = 0x000000000001, port = "188" , dst_mac = 0xb8599fdf07cb, src_mac = 0xb8599fdf07cb).push()
+
+
+//switch 1
+table3 = bfrt.netgvt_l2_16.pipe.SwitchIngress.eth_forward
+entry = table3.entry_with_gvt_forward(src_addr = 0x000000000001, port = "136" , dst_mac = 0x000000000001, src_mac = 0x000000000001).push()
+/----------------------end netgvt with replication-----------------------/
+
+
+bfrt.netgvt_l2_16.pipe.LVT_pid_1.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_2.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_3.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_4.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_5.add(0, 100000)
+bfrt.netgvt_l2_16.pipe.LVT_pid_6.add(0, 100000)
+
+
+/-----------------------netgvt without replication---------------------------/
+
