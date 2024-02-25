@@ -6,6 +6,11 @@ import random
 import struct
 import ast
 
+import warnings
+warnings.filterwarnings(action='ignore',message='Python 3.6 is no longer supported')
+#from cryptography.utils import CryptographyDeprecationWarning
+#warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
+
 from scapy.all import sendp, send, get_if_list, get_if_hwaddr
 from scapy.all import Packet
 from scapy.all import Ether, IP, UDP, TCP, Raw
@@ -18,6 +23,17 @@ from scapy.all import sniff
 import numpy as np
 
 import argparse,sys,time,os
+
+#from cryptography.utils import CryptographyDeprecationWarning
+#warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
+
+#import warnings
+#warnings.filterwarnings(action='ignore',message='Python 3.6 is no longer supported')
+#import cryptography
+#from warnings import filterwarnings
+#filterwarnings("ignore")
+#import warnings 
+#warnings.filterwarnings(action='ignore',module='.*scapy.*')
 
 ETHERTYPE_GVT = 0x8666
 TYPE_PROPOSAL = 10
@@ -55,12 +71,14 @@ class strongReplay:
     def handle_unorder_pkt(self, pkt):
         sys.stdout.flush()
         print("got something")
+        print(pkt[GvtProtocol].round)
         pkt2 =  Ether(src=get_if_hwaddr(self.iface_), dst='ff:ff:ff:ff:ff:ff', type = ETHERTYPE_GVT)
         pkt2 = pkt2 / GvtProtocol(type=TYPE_REPLAY, value=pkt[GvtProtocol].value, pid=pkt[GvtProtocol].pid, round =pkt[GvtProtocol].round)
         sendp(pkt2, iface=self.iface_, verbose=False)
         sys.stdout.flush()
+        pkt.show2(pkt2)
         self.unordered = self.unordered + 1
-        print(self.unordered)
+        #print(self.unordered)
     def receive_unordered(self):
         #if receives something out of order, replay again
         sys.stdout.flush()
@@ -73,11 +91,14 @@ class strongReplay:
         print(time.time() - initial)
     def handle_ack_pkt(self, pkt):
         sys.stdout.flush()
+        print("got ack")
         i = self.ordered_list.pop(0)
         id, round, value = i
         pkt_base[GvtProtocol].round = round
         pkt_base[GvtProtocol].value = value
         pkt_base[GvtProtocol].pid = id
+        pkt_base.show2()
+        x = input()
         sendp(pkt_base, iface=self.iface_, verbose=False)        
         sys.stdout.flush()   
     def receive_lastone(self):
@@ -98,15 +119,18 @@ class strongReplay:
         pkt_base[GvtProtocol].round = round
         pkt_base[GvtProtocol].value = value
         pkt_base[GvtProtocol].pid = id
+        pkt_base.show2()
         sendp(pkt_base, iface=iface_, verbose=False)   
 
 
 teste = strongReplay(iface_)
-for i in range(2,102):
-    if i % 2 != 0:
-        teste.ordered_list.append([10, i, 0]) 
+for i in range(1,101):
+      teste.ordered_list.append([10, i, 0])
+#      if i % 2 != 0:
+#           teste.ordered_list.append([10, i, 0]) 
 
 initial = time.time()
-pkt_base[GvtProtocol].round = 1
-sendp(pkt_base, iface=iface_, verbose=False)        
+#pkt_base[GvtProtocol].round = 1
+#sendp(pkt_base, iface=iface_, verbose=False)        
 teste.start_replay(10,teste.ordered_list)
+	
