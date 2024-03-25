@@ -27,6 +27,8 @@
 #define TYPE_FAILURE 3
 #define TYPE_DELFAILURE 4
 
+#define SYNC 1
+//define ASYNC 1
 
 #define MAX_WORKERS 3
 #define BUFFER_SIZE 2
@@ -364,12 +366,17 @@ control SwitchIngress(
 	            bounce_pkt();
 	            read_counter.execute(0);         	      	            
 	        }else if (hdr.ssp.actionCode == SSP_ACTION_CLOCK){
-	            ig_md.it = update_clock_counter.execute(0);
+	            #ifdef SYNC
+                    ig_md.it = update_clock_counter.execute(0);
 	            if (ig_md.it == 0){
 	            	ig_intr_tm_md.mcast_grp_a =  1; //multicast to group1
 	            }else{ 
 	                drop_();
 	            }
+		    #endif
+		    #ifdef ASYNC
+		    ig_intr_tm_md.mcast_grp_a =  1; //multicast to group1
+                    #endif	
 	        } 
                 //ends aggregation
 	}else{
