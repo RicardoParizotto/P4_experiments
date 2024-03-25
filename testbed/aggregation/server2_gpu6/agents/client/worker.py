@@ -127,8 +127,10 @@ class Worker:
                 FINISH_FILE.touch()
 
             print("Waiting clock...")
+            waiting_iter = time.time()
             self.signal_clock(step)
-
+            waiting_end = time.time()
+            print("#waiting: " + str(waiting_end - waiting_iter))
 
             iter_end = time.time()
 
