@@ -16,7 +16,7 @@ import torch
 from constants import GRADS_PER_PKT, SCALING_FACTOR, MAX_INT, MIN_INT
 
 conf.checkIPaddr = False
-conf.iface = "enp101s0f1"
+conf.iface = "enp132s0f0np0"
 
 actions = {
     "read_row": 0,
@@ -98,14 +98,14 @@ bind_layers(UDP, SspHeader, sport=8000, dport=8000)
 bind_layers(SspHeader, Gradient, action=0)
 
 BASE_PKT = (
-    Ether(src="b8:59:9f:df:07:cb", dst="00:15:4d:12:11:a9")
-    / IP(dst="10.50.1.1", src="10.50.1.6")
+    Ether(src="94:6d:ae:5c:87:42", dst="94:6d:ae:5c:87:72")
+    / IP(dst="10.0.1.1", src="10.0.1.2")
     / UDP(sport=8000, dport=8000)
 )
 
 BASE_MULTICAST_PKT = (
-    Ether(src="b8:59:9f:df:07:cb", dst="ff:ff:ff:ff:ff:ff")
-    / IP(dst="10.50.1.2", src="10.50.1.6")
+    Ether(src="94:6d:ae:5c:87:42", dst="ff:ff:ff:ff:ff:ff")
+    / IP(dst="10.0.1.1", src="10.0.1.2")
     #Ether(src="00:15:4d:12:11:a9", dst=get_if_hwaddr(conf.iface))
     #/ IP(dst="10.50.0.2", src=get_if_addr(conf.iface))
     / UDP(sport=8000, dport=8000)
