@@ -108,6 +108,7 @@ class Worker:
 
             print(f"========== Step {step} ==========")
 
+            iter_start = time.time()
             print("Getting new model...")
             current_model = self.get_new_model(
                 step, num_splits, parameter_shapes, total_size
@@ -117,12 +118,7 @@ class Worker:
                 self.straggler_generator.step(mean(self.iter_times))
 
             print("Training...")
-            iter_start = time.time()
             current_model, acc = self.run_training_step(step, current_model, iter_train)
-            iter_end = time.time()
-
-            self.iter_times.append(iter_end - iter_start)
-            print("#it: " + str(iter_end - iter_start))  
             print("Sending gradients...")
             
             self.send_gradients(step, current_model, num_splits, self.shim.get_if())
@@ -131,7 +127,15 @@ class Worker:
                 FINISH_FILE.touch()
 
             print("Waiting clock...")
+            waiting_iter = time.time()
             self.signal_clock(step)
+            waiting_end = time.time()
+            print("#waiting: " + str(waiting_end - waiting_iter))
+
+            iter_end = time.time()
+
+            self.iter_times.append(iter_end - iter_start)
+            print("#it: " + str(iter_end - iter_start))
 
             if acc > self.target_accuracy:
                 print("Finishing by hitting target accuracy")

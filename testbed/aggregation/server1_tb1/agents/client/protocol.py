@@ -15,7 +15,7 @@ import torch
 
 from constants import GRADS_PER_PKT, SCALING_FACTOR, MAX_INT, MIN_INT
 
-conf.iface = "enp1s0np1"
+conf.iface = "enp132s0f0np0"
 conf.checkIPaddr = False
 
 actions = {
@@ -32,7 +32,7 @@ def quantize(fp):
 
 
 def unquantize(v):
-    return v / SCALING_FACTOR
+    return torch.true_divide(v, SCALING_FACTOR)
 
 
 # Protocol definitions
@@ -95,11 +95,18 @@ bind_layers(UDP, SspHeader, sport=8000, dport=8000)
 bind_layers(SspHeader, Gradient, action=0)
 
 BASE_PKT = (
-    Ether(src="00:15:4d:12:11:a9", dst=get_if_hwaddr(conf.iface))
-    / IP(dst="10.50.0.2", src=get_if_addr(conf.iface))
+    Ether(dst="ff:ff:ff:ff:ff:ff", src=get_if_hwaddr(conf.iface))
+    / IP(dst="10.0.1.2", src=get_if_addr(conf.iface))
     / UDP(sport=8000, dport=8000)
 )
 
+BASE_MULTICAST_PKT = (
+    Ether(src="ff:ff:ff:ff:ff:ff", dst="ff:ff:ff:ff:ff:ff")
+    / IP(dst="10.0.1.2", src="10.0.1.1")
+    #Ether(src="00:15:4d:12:11:a9", dst=get_if_hwaddr(conf.iface))
+    #/ IP(dst="10.50.0.2", src=get_if_addr(conf.iface))
+    / UDP(sport=8000, dport=8000)
+)
 
 def assemble_pkt(worker_id, clock, segment, action="read_row", grads=None):
     """Assemble an packet with the defined protocol"""
