@@ -22,8 +22,8 @@
 
 #define number_of_processes 5
 
-#define STRONG 1
-//define WEAK 1
+//#define STRONG 1
+#define WEAK 1
 
 struct metadata_t {
     bit<32> iterator_0;
@@ -172,7 +172,7 @@ control SwitchIngress(
  
         bit<48> tmp = hdr.ethernet.dst_addr;
         hdr.ethernet.dst_addr = hdr.ethernet.src_addr;
-
+        hdr.ethernet.src_addr = tmp;
     }
 
     RegisterAction<bit<32>, _, bit<32>>(LVT_pid_0) Update_lvt_pid_0 = {
