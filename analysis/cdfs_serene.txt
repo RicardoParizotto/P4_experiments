@@ -1,0 +1,23 @@
+# defining the libraries 
+import numpy as np 
+import matplotlib.pyplot as plt 
+import seaborn as sns
+
+plt.rcParams['font.family'] = 'sans-serif'
+
+
+fig,ax = plt.subplots(figsize=(6, 3))
+
+
+file1 = open("../testbed/aggregation/server1_tb1/agents/example1/async_straggler/h0", r)
+async_data = []
+
+lines = file1.readlines()
+
+for l in lines:
+    if l:
+        l = l.split(":")
+        if l[0] == "#waiting":
+            async_data.append(float(l[1]))
+        
+sns.kdeplot(async_data, cumulative = True, color ='mediumblue', zorder=1)
