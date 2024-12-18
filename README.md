@@ -1,4 +1,4 @@
-# RESIST_ASPLOS
+# RESIST
 
 RESIST is a system that provides provides implementation of failure recovery for INCs. It includes an asynchronous replication protocol for keeping switch replicas
 synchronized and uses a log-replay to recover after failures. The objective of the log-replay is to allow different notions of consistency by replaying packets 
